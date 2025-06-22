@@ -45,7 +45,8 @@ export default function Dashboard(props: { disableCustomTheme?: boolean }) {
         flexDirection: 'column', 
         minHeight: '100vh',
         px: '0vw',
-        width: '100vw',
+        width: '95%',
+        mx: 'auto',
         position: 'relative'
       }}>
         {/* Top Navigation */}

@@ -11,6 +11,7 @@ import MenuItem from '@mui/material/MenuItem';
 import Drawer from '@mui/material/Drawer';
 import MenuIcon from '@mui/icons-material/Menu';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
+import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import ColorModeIconDropdown from '.././theme/ColorModeIconDropdown';
 import Sitemark from './SitemarkIcon';
 
@@ -54,23 +55,17 @@ export default function AppAppBar() {
             <Sitemark />
             <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
               <Button variant="text" color="info" size="small">
-                Features
-              </Button>
-              <Button variant="text" color="info" size="small">
-                Testimonials
-              </Button>
-              <Button variant="text" color="info" size="small">
-                Highlights
-              </Button>
-              <Button variant="text" color="info" size="small">
-                Pricing
-              </Button>
-              <Button variant="text" color="info" size="small" sx={{ minWidth: 0 }}>
-                FAQ
-              </Button>
-              <Button variant="text" color="info" size="small" sx={{ minWidth: 0 }}>
-                Blog
-              </Button>
+  Beranda
+</Button>
+<Button variant="text" color="info" size="small">
+  Analitics
+</Button>
+<Button variant="text" color="info" size="small">
+  Informasi Data
+</Button>
+<Button variant="text" color="info" size="small">
+  Petunjuk Penggunaan
+</Button>
             </Box>
           </Box>
           <Box
@@ -80,11 +75,40 @@ export default function AppAppBar() {
               alignItems: 'center',
             }}
           >
-            <Button color="primary" variant="text" size="small">
-              Sign in
+            <Button 
+              variant="outlined" 
+              color="primary" 
+              size="small" 
+              startIcon={<FileDownloadIcon />}
+              sx={{ 
+                borderColor: 'primary.main', 
+                color: 'primary.main', 
+                backgroundColor: 'transparent',
+                textTransform: 'none',
+                '&:hover': {
+                  borderColor: 'primary.dark',
+                  backgroundColor: 'action.hover',
+                },
+              }}
+            >
+              Download Data ini
             </Button>
-            <Button color="primary" variant="contained" size="small">
-              Sign up
+            <Button 
+              variant="outlined" 
+              color="primary" 
+              size="small" 
+              sx={{ 
+                borderColor: 'primary.main', 
+                color: 'primary.main', 
+                backgroundColor: 'transparent',
+                textTransform: 'none',
+                '&:hover': {
+                  borderColor: 'primary.dark',
+                  backgroundColor: 'action.hover',
+                },
+              }}
+            >
+              Tentang Kami
             </Button>
             <ColorModeIconDropdown />
           </Box>
@@ -115,23 +139,16 @@ export default function AppAppBar() {
                   </IconButton>
                 </Box>
 
-                <MenuItem>Features</MenuItem>
-                <MenuItem>Testimonials</MenuItem>
-                <MenuItem>Highlights</MenuItem>
-                <MenuItem>Pricing</MenuItem>
-                <MenuItem>FAQ</MenuItem>
-                <MenuItem>Blog</MenuItem>
-                <Divider sx={{ my: 3 }} />
-                <MenuItem>
-                  <Button color="primary" variant="contained" fullWidth>
-                    Sign up
-                  </Button>
-                </MenuItem>
-                <MenuItem>
-                  <Button color="primary" variant="outlined" fullWidth>
-                    Sign in
-                  </Button>
-                </MenuItem>
+                <MenuItem>Beranda</MenuItem>
+<MenuItem>Analitics</MenuItem>
+<MenuItem>Informasi Data</MenuItem>
+<MenuItem>Petunjuk Penggunaan</MenuItem>
+<Divider sx={{ my: 3 }} />
+<MenuItem>
+  <Button variant="outlined" color="primary" fullWidth sx={{ borderColor: 'primary.main', color: 'primary.main', backgroundColor: 'transparent' }}>
+    Tentang Kami
+  </Button>
+</MenuItem>
               </Box>
             </Drawer>
           </Box>
