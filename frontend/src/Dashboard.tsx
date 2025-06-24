@@ -7,10 +7,10 @@ import { alpha } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
-import Header from './components/Header';
 import MainGrid from './components/MainGrid';
 import AppTheme from './theme/AppTheme';
 import AppAppBar from './components/AppAppBar';
+import MapChart from './components/MapScatterHeatChartandOther.jsx';
 import {
   chartsCustomizations,
   dataGridCustomizations,
@@ -68,7 +68,7 @@ export default function Dashboard(props: { disableCustomTheme?: boolean }) {
               ? `rgba(${theme.vars.palette.background.defaultChannel} / 1)`
               : alpha(theme.palette.background.default, 1),
             overflow: 'auto',
-            mt: 20,
+            mt: 8,
             px: '0vw'
           })}
         >

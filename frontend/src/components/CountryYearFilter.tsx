@@ -38,7 +38,7 @@ export default function CountryYearFilter({
   };
 
   return (
-    <Grid container spacing={2} columns={15} alignItems="center">
+    <Grid container spacing={2} columns={15} alignItems="center" sx={{ mt: 2 }}>
       <Grid size={{ xs: 15, sm: 3 }}>
         <Autocomplete
           options={countries.map((c: { name: string }) => c.name)}
@@ -51,7 +51,7 @@ export default function CountryYearFilter({
               <TextField
                 {...params}
                 label={showLabel ? 'Pilih Negara' : ''}
-                variant="outlined"
+                variant="standard"
                 size="small"
                 onFocus={() => setFocused(true)}
                 onBlur={() => setFocused(false)}
@@ -63,7 +63,8 @@ export default function CountryYearFilter({
                     p: 0
                   },
                   fontSize: 14
-                }}
+                }
+              }
               />
             );
           }}
@@ -85,7 +86,8 @@ export default function CountryYearFilter({
                 width: 24,
                 height: 24,
                 marginRight: 0.5,
-                '& svg': { fontSize: 16 }
+                '& svg': { fontSize: 16 },
+                border: 'none'
               }
             },
             popupIndicator: {
@@ -93,7 +95,8 @@ export default function CountryYearFilter({
                 p: 0,
                 width: 24,
                 height: 24,
-                '& svg': { fontSize: 16 }
+                '& svg': { fontSize: 16 },
+                border: 'none'
               }
             }
           }}
@@ -110,11 +113,9 @@ export default function CountryYearFilter({
             variant="outlined"
             sx={{
               px: 1,
-              py: 0.5,
               borderRadius: 2,
               fontSize: 14,
               minWidth: 100,
-              mb: 0.5,
               textAlign: 'center',
               backgroundColor: 'background.paper'
             }}
@@ -125,11 +126,12 @@ export default function CountryYearFilter({
             value={yearRange}
             onChange={handleYearChange}
             valueLabelDisplay="auto"
+            marks
             min={minYear}
             max={maxYear}
             step={1}
-            marks={false}
             sx={{ width: '100%' }}
+            size="small"
           />
         </Box>
       </Grid>

@@ -12,6 +12,11 @@ import PageViewsBarChart from './PageViewsBarChart';
 import SessionsChart from './SessionsChart';
 import StatCard, { StatCardProps } from './StatCard';
 import CountryYearFilter from './CountryYearFilter';
+import YoYGrowthTrend from './yoYChartAndGauge';
+import Divider from '@mui/material/Divider';
+import MapChart from './MapScatterHeatChartandOther.jsx';
+import ReactCountryFlag from 'react-country-flag';
+
 
 // --- Dynamic Dashboard State and Fetch Logic ---
 import { useEffect, useState } from 'react';
@@ -20,10 +25,10 @@ const DEFAULT_COUNTRY = 'World';
 const DEFAULT_YEAR_RANGE = [2013, 2023];
 
 const GAS_KEYS = [
-  { key: 'total', title: 'Total GHG (MtCO2)' },
-  { key: 'co2', title: 'Gas CO2 (MtCO2)' },
-  { key: 'n2o', title: 'Gas N2O (MtCO2)' },
-  { key: 'ch4', title: 'Gas CH4 (MtCO2)' },
+  { key: 'total', title: 'Total Emisi GHG (MtCO2)' },
+  { key: 'co2', title: 'Emisi Gas CO2 (MtCO2)' },
+  { key: 'n2o', title: 'Emisi Gas N2O (MtCO2)' },
+  { key: 'ch4', title: 'Emisi Gas CH4 (MtCO2)' },
 ];
 
 export default function MainGrid() {
@@ -33,6 +38,7 @@ export default function MainGrid() {
   const [growth, setGrowth] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [countryCode, setCountryCode] = useState<string>('WLD');
 
   // Fetch stats and growth when country or year range changes
   useEffect(() => {
@@ -46,10 +52,12 @@ export default function MainGrid() {
         const data = await res.json();
         const countryObj = data.countries.find((c: any) => c.name === country);
         const code = countryObj ? countryObj.code : 'WLD';
+        setCountryCode(code);
 
         // Fetch statistics
         const statsRes = await fetch(`http://127.0.0.1:8000/statistics?country_code=${code}&start_year=${yearRange[0]}&end_year=${yearRange[1]}`);
         const statsData = await statsRes.json();
+        console.log('Stats data from API:', statsData); // Debug log
         // Fetch growth
         const growthRes = await fetch(`http://127.0.0.1:8000/growth?country_code=${code}&start_year=${yearRange[0]}&end_year=${yearRange[1]}`);
         const growthData = await growthRes.json();
@@ -67,11 +75,10 @@ export default function MainGrid() {
   // Prepare StatCard data
   const statCards = GAS_KEYS.map(({ key, title }) => {
     const stat = stats?.[key] || {};
-    let growthVal = growth?.[key];
-    // Jika growthVal array, ambil index 0
-    if (Array.isArray(growthVal)) {
-      growthVal = growthVal.length > 0 ? growthVal[0] : undefined;
-    }
+    console.log(`Stats for ${key}:`, stat); // Debug log
+    // Extract growth value from the nested response structure
+    let growthVal = growth?.growth?.[key];
+    console.log(`Growth for ${key}:`, growthVal); // Debug log
     // Compose value string (mean, median, etc. in Indonesian)
     const value = stat.mean !== undefined && stat.mean !== null ? stat.mean.toLocaleString('id-ID', { maximumFractionDigits: 2 }) : '-';
     // Compose interval string
@@ -82,26 +89,33 @@ export default function MainGrid() {
       if (growthVal > 0) trend = 'up';
       else if (growthVal < 0) trend = 'down';
     }
-    // Prepare data array for chart (use all year values in range)
-    let dataArr: number[] = [];
+    // Prepare data array for chart with years and values
+    let chartData: { year: number; value: number }[] = [];
     if (stats && stats[key]) {
       // For chart, fetch raw values for each year in range
-      const years = Array.from({ length: yearRange[1] - yearRange[0] + 1 }, (_, i) => (yearRange[0] + i).toString());
-      dataArr = years.map(yr => {
-        // Use stats[key].raw_values[yr] if backend provides, otherwise fallback to mean
-        if (stats[key].raw_values && stats[key].raw_values[yr] !== undefined && stats[key].raw_values[yr] !== null) {
-          return stats[key].raw_values[yr];
-        }
-        return stat.mean;
-      }).filter(v => v !== null) as number[];
-      if (dataArr.length === 0 && stat.mean) dataArr = [stat.mean];
+      const years = Array.from({ length: yearRange[1] - yearRange[0] + 1 }, (_, i) => yearRange[0] + i);
+      chartData = years.map(year => {
+        const yearStr = year.toString();
+        // Use stats[key].raw_values[yearStr] if backend provides, otherwise fallback to mean
+        const value = (stats[key].raw_values && stats[key].raw_values[yearStr] !== undefined && stats[key].raw_values[yearStr] !== null)
+          ? stats[key].raw_values[yearStr]
+          : stat.mean;
+        return {
+          year,
+          value: value !== null ? Number(value) : 0
+        };
+      }).filter(item => item.value !== null);
+
+      if (chartData.length === 0 && stat.mean) {
+        chartData = [{ year: yearRange[0], value: Number(stat.mean) }];
+      }
     }
     return {
       title,
       value,
       interval,
       trend,
-      data: dataArr,
+      data: chartData,
       details: stat,
       growth: growthVal,
       country: country,
@@ -110,9 +124,10 @@ export default function MainGrid() {
 
   return (
     <Box sx={{ width: '100%', maxWidth: { sm: '100%', md: '1700px' } }}>
-      <Typography component="h2" variant="h6" sx={{ mb: 2 }}>
-        Overview
+      <Typography component="h2" variant="h6" sx={{ mb: 2, mt: 1 }}>
+        Gambaran Umum GHGE berdasarkan Tahun dan Area
       </Typography>
+      <Divider />
       <CountryYearFilter
         onCountryChange={val => val && setCountry(val)}
         onYearChange={range => setYearRange(range)}
@@ -154,27 +169,47 @@ export default function MainGrid() {
           <HighlightedCard />
         </Grid>
         <Grid size={{ xs: 12, md: 7.5 }}>
-          <SessionsChart />
+          <SessionsChart yearRange={yearRange as [number, number]} />
         </Grid>
         <Grid size={{ xs: 12, md: 7.5 }}>
-          <PageViewsBarChart />
+          <PageViewsBarChart yearRange={yearRange as [number, number]} countryCode={countryCode} />
         </Grid>
       </Grid>
+      <Typography component="h2" variant="h6" sx={{ mb: 2 }}>
+        Gambaran Umum GHGE berdasarkan Area, Tahun, dan Tipe Gas
+      </Typography>
+      <Divider sx={{ mb: 2 }} />
+      <Grid>
+        <YoYGrowthTrend />
+      </Grid>
+      <Typography component="h2" variant="h6" sx={{ mb: 2, mt: 2 }}>
+        Gambaran Umum GHGE berdasarkan Tahun dan Tipe Gas
+      </Typography>
+      <Divider sx={{ mb: 2 }} />
+      <Box sx={{ width: '100%', mt: 4 }}>
+        <MapChart />
+      </Box>
       <Typography component="h2" variant="h6" sx={{ mb: 2 }}>
         Details
       </Typography>
       <Grid container spacing={2} columns={12}>
-        <Grid size={{ xs: 12, lg: 9 }}>
-          <CustomizedDataGrid />
-        </Grid>
-        <Grid size={{ xs: 12, lg: 3 }}>
-          <Stack gap={2} direction={{ xs: 'column', sm: 'row', lg: 'column' }}>
-            <CustomizedTreeView />
-            <ChartUserByCountry />
-          </Stack>
-        </Grid>
+        <CustomizedDataGrid />
       </Grid>
       <Copyright sx={{ my: 4 }} />
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+        <ReactCountryFlag
+          countryCode="ID"
+          svg
+          style={{
+            width: '1.5em',
+            height: '1em',
+            borderRadius: '2px',
+            boxShadow: '0 0 1px 0px #888',
+          }}
+          title="Indonesia"
+        />
+        <span>Indonesia</span>
+      </Box>
     </Box>
   );
 }

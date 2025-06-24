@@ -74,3 +74,4 @@ export const chartsCustomizations: ChartsComponents<Theme> = {
     },
   },
 };
+export default chartsCustomizations;

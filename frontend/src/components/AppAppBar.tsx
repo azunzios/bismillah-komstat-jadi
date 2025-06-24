@@ -11,24 +11,26 @@ import MenuItem from '@mui/material/MenuItem';
 import Drawer from '@mui/material/Drawer';
 import MenuIcon from '@mui/icons-material/Menu';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
+import InfoIcon from '@mui/icons-material/Info';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import ColorModeIconDropdown from '.././theme/ColorModeIconDropdown';
 import Sitemark from './SitemarkIcon';
+import Typography from '@mui/material/Typography';
+import Stack from '@mui/material/Stack';
 
 const StyledToolbar = styled(Toolbar)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
   flexShrink: 0,
-  borderRadius: `calc(${theme.shape.borderRadius}px + 8px)`,
   backdropFilter: 'blur(24px)',
   border: '1px solid',
   borderColor: (theme.vars || theme).palette.divider,
   backgroundColor: theme.vars
     ? `rgba(${theme.vars.palette.background.defaultChannel} / 0.4)`
     : alpha(theme.palette.background.default, 0.4),
-  boxShadow: (theme.vars || theme).shadows[1],
-  padding: '8px 12px',
+  padding: '8px 3vw',
+  width: "100%",
 }));
 
 export default function AppAppBar() {
@@ -38,6 +40,8 @@ export default function AppAppBar() {
     setOpen(newOpen);
   };
 
+  const navItems = ['Beranda','Analitics','Informasi Data','Petunjuk Penggunaan'];
+
   return (
     <AppBar
       position="fixed"
@@ -46,26 +50,30 @@ export default function AppAppBar() {
         boxShadow: 0,
         bgcolor: 'transparent',
         backgroundImage: 'none',
-        mt: 'calc(var(--template-frame-height, 0px) + 28px)',
+        width: "100vw",
       }}
     >
-      <Container maxWidth="lg">
+      <Container maxWidth={false} disableGutters>
         <StyledToolbar variant="dense" disableGutters>
           <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center', px: 0 }}>
             <Sitemark />
-            <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
-              <Button variant="text" color="info" size="small">
-  Beranda
-</Button>
-<Button variant="text" color="info" size="small">
-  Analitics
-</Button>
-<Button variant="text" color="info" size="small">
-  Informasi Data
-</Button>
-<Button variant="text" color="info" size="small">
-  Petunjuk Penggunaan
-</Button>
+            <Box
+              sx={{
+                display: { xs: 'none', md: 'flex' },
+                flexGrow: 1,
+                maxWidth: 600,
+                alignItems: 'center',
+              }}
+            >
+              <Divider orientation="vertical" flexItem />
+              {navItems.map((label, idx) => (
+                <React.Fragment key={label}>
+                  <Button variant="text" color="info" size="small" sx={{ flex: 1, minWidth: 0, justifyContent: 'flex-start', textAlign: 'left', '&:hover': { backgroundColor: 'transparent', textDecoration: 'underline' } }} disableRipple>
+                    {label}
+                  </Button>
+                  <Divider orientation="vertical" flexItem />
+                </React.Fragment>
+              ))}
             </Box>
           </Box>
           <Box
@@ -75,41 +83,18 @@ export default function AppAppBar() {
               alignItems: 'center',
             }}
           >
-            <Button 
-              variant="outlined" 
-              color="primary" 
-              size="small" 
-              startIcon={<FileDownloadIcon />}
-              sx={{ 
-                borderColor: 'primary.main', 
-                color: 'primary.main', 
-                backgroundColor: 'transparent',
-                textTransform: 'none',
-                '&:hover': {
-                  borderColor: 'primary.dark',
-                  backgroundColor: 'action.hover',
-                },
-              }}
-            >
-              Download Data ini
-            </Button>
-            <Button 
-              variant="outlined" 
-              color="primary" 
-              size="small" 
-              sx={{ 
-                borderColor: 'primary.main', 
-                color: 'primary.main', 
-                backgroundColor: 'transparent',
-                textTransform: 'none',
-                '&:hover': {
-                  borderColor: 'primary.dark',
-                  backgroundColor: 'action.hover',
-                },
-              }}
-            >
-              Tentang Kami
-            </Button>
+            <Divider orientation="vertical" flexItem />
+            <Stack direction="row" spacing={1} divider={<Divider orientation="vertical" flexItem />}
+              sx={{ alignItems: 'center' }}>
+              <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center', color: 'primary.main', gap: 0.5, flex: 1, minWidth: 0, cursor: 'pointer', textDecoration: 'none', '&:hover': { textDecoration: 'underline', textDecorationThickness: '3px' } }}>
+                Download Data ini
+                <FileDownloadIcon fontSize="small" />
+              </Typography>
+              <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center', color: 'primary.main', gap: 0.5, flex: 1, minWidth: 0, cursor: 'pointer', textDecoration: 'none', '&:hover': { textDecoration: 'underline', textDecorationThickness: '3px' } }}>
+                Tentang Kami
+              </Typography>
+            </Stack>
+            <Divider orientation="vertical" flexItem />
             <ColorModeIconDropdown />
           </Box>
           <Box sx={{ display: { xs: 'flex', md: 'none' }, gap: 1 }}>
@@ -121,11 +106,6 @@ export default function AppAppBar() {
               anchor="top"
               open={open}
               onClose={toggleDrawer(false)}
-              PaperProps={{
-                sx: {
-                  top: 'var(--template-frame-height, 0px)',
-                },
-              }}
             >
               <Box sx={{ p: 2, backgroundColor: 'background.default' }}>
                 <Box
@@ -139,16 +119,18 @@ export default function AppAppBar() {
                   </IconButton>
                 </Box>
 
-                <MenuItem>Beranda</MenuItem>
-<MenuItem>Analitics</MenuItem>
-<MenuItem>Informasi Data</MenuItem>
-<MenuItem>Petunjuk Penggunaan</MenuItem>
-<Divider sx={{ my: 3 }} />
-<MenuItem>
-  <Button variant="outlined" color="primary" fullWidth sx={{ borderColor: 'primary.main', color: 'primary.main', backgroundColor: 'transparent' }}>
-    Tentang Kami
-  </Button>
-</MenuItem>
+                <Divider orientation="vertical" flexItem sx={{ my: 1 }} />
+                <MenuItem sx={{ justifyContent: 'flex-start', '&:hover': { backgroundColor: 'transparent', textDecoration: 'underline' } }}>Beranda</MenuItem>
+                <MenuItem sx={{ justifyContent: 'flex-start', '&:hover': { backgroundColor: 'transparent', textDecoration: 'underline' } }}>Analitics</MenuItem>
+                <MenuItem sx={{ justifyContent: 'flex-start', '&:hover': { backgroundColor: 'transparent', textDecoration: 'underline' } }}>Informasi Data</MenuItem>
+                <MenuItem sx={{ justifyContent: 'flex-start', '&:hover': { backgroundColor: 'transparent', textDecoration: 'underline' } }}>Petunjuk Penggunaan</MenuItem>
+                <Divider sx={{ my: 0}} />
+                <MenuItem>
+                  <Button variant="text" color="primary" fullWidth sx={{ textTransform: 'none', cursor: 'pointer', '&:hover': { textDecoration: 'underline', textDecorationThickness: '3px', backgroundColor: 'transparent' } }}>
+                    Tentang Kami
+                  </Button>
+                </MenuItem>
+                <Divider orientation="vertical" flexItem sx={{ my: 1 }} />
               </Box>
             </Drawer>
           </Box>

@@ -1,12 +1,13 @@
 import * as React from 'react';
 import { DataGrid } from '@mui/x-data-grid';
-import { columns, rows } from '../internals/data/gridData';
+import { columns, rows, useEmissionData } from '../internals/data/gridData';
 
 export default function CustomizedDataGrid() {
+  const { rows: hookRows, loading, error } = useEmissionData();
   return (
-    <DataGrid
+  <DataGrid
       checkboxSelection
-      rows={rows}
+      rows={hookRows}
       columns={columns}
       getRowClassName={(params) =>
         params.indexRelativeToCurrentPage % 2 === 0 ? 'even' : 'odd'

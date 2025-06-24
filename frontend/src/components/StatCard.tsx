@@ -1,4 +1,3 @@
-// StatCard.tsx
 import * as React from 'react';
 import { useTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
@@ -10,19 +9,30 @@ import Typography from '@mui/material/Typography';
 import { SparkLineChart } from '@mui/x-charts/SparkLineChart';
 import { areaElementClasses } from '@mui/x-charts/LineChart';
 
+export interface DataPoint {
+  year: number;
+  value: number;
+}
+
+// Updated interface to handle growth object structure
+export interface GrowthObject {
+  value: number[];
+  unit: string[];
+  error: Record<string, any>;
+}
+
 export interface StatCardProps {
   title: string;
   value: string | number;
   interval: string;
   trend: 'up' | 'down' | 'neutral';
-  data: number[];
+  data: DataPoint[];
   details: any;
-  growth?: number;
+  growth?: number | GrowthObject; // Updated to handle both number and object
   country?: string;
   loading?: boolean;
 }
 
-// Komponen helper gradien area
 function AreaGradient({ color, id }: { color: string; id: string }) {
   return (
     <defs>
@@ -47,30 +57,57 @@ const StatCard: React.FC<StatCardProps> = ({
 }) => {
   const theme = useTheme();
 
-  const trendColors = {
-    up: theme.palette.error.main,  // Merah untuk kenaikan
-    down: theme.palette.success.main,  // Hijau untuk penurunan
-    neutral: theme.palette.grey[500],
+  // Helper function to extract growth value
+  const getGrowthValue = (growth: number | GrowthObject | undefined): number | undefined => {
+    if (growth === undefined) return undefined;
+
+    if (typeof growth === 'number') {
+      return growth;
+    }
+
+    // Handle growth object structure
+    if (growth && typeof growth === 'object' && 'value' in growth) {
+      const growthObj = growth as GrowthObject;
+      return growthObj.value && growthObj.value.length > 0 ? growthObj.value[0] : undefined;
+    }
+
+    return undefined;
   };
+
+  const growthValue = getGrowthValue(growth);
+
+  const derivedTrend: 'up' | 'down' | 'neutral' =
+    growthValue !== undefined && !isNaN(growthValue)
+      ? growthValue > 0
+        ? 'up'
+        : growthValue < 0
+          ? 'down'
+          : 'neutral'
+      : trend;
+
+  const trendColors = {
+    up: theme.palette.error.main,
+    down: theme.palette.success.main,
+    neutral: theme.palette.grey[500],
+  } as const;
 
   const trendIcons = {
     up: '▲',
     down: '▼',
     neutral: '■',
-  };
+  } as const;
 
-  const trendLabel = (growth !== undefined && !isNaN(growth))
-    ? `${growth > 0 ? '+' : ''}${growth.toFixed(2)}%`
-    : trend === 'up'
+  const trendLabel = (growthValue !== undefined && !isNaN(growthValue))
+    ? `${growthValue > 0 ? '+' : ''}${growthValue.toFixed(2)}%`
+    : derivedTrend === 'up'
       ? '+25%'
-      : trend === 'down'
+      : derivedTrend === 'down'
         ? '-25%'
         : '+5%';
 
-  const chartColor = trendColors[trend];
-  const trendIcon = trendIcons[trend];
+  const chartColor = trendColors[derivedTrend];
+  const trendIcon = trendIcons[derivedTrend];
 
-  // Helper untuk stat line
   const statLine = (label: string, value: number | undefined, digits = 2) =>
     value !== undefined && !isNaN(value) ? (
       <Stack direction="row" spacing={1} alignItems="center">
@@ -80,6 +117,25 @@ const StatCard: React.FC<StatCardProps> = ({
         </Typography>
       </Stack>
     ) : null;
+
+  const { chartData, years } = React.useMemo(() => {
+    const values: number[] = [];
+    const yearLabels: string[] = [];
+
+    data.forEach(item => {
+      if (item?.value !== undefined && item.year !== undefined) {
+        values.push(Number(item.value));
+        yearLabels.push(String(item.year));
+      }
+    });
+
+    return { chartData: values, years: yearLabels };
+  }, [data]);
+
+  const formatTooltip = (value: number, index: number) => {
+    const year = years[index] || '';
+    return `${year}: ${value.toFixed(2)}`;
+  };
 
   return (
     <Card variant="outlined" sx={{ height: '100%', flexGrow: 1 }}>
@@ -91,10 +147,7 @@ const StatCard: React.FC<StatCardProps> = ({
         )}
         {loading ? (
           <Box>
-            <Box sx={{ width: '60%', height: 20, bgcolor: '#e0e0e0', borderRadius: 1, mb: 1 }} />
-            <Box sx={{ width: '80%', height: 16, bgcolor: '#e0e0e0', borderRadius: 1, mb: 1 }} />
-            <Box sx={{ width: '100%', height: 40, bgcolor: '#e0e0e0', borderRadius: 1, mt: 2 }} />
-            <Box sx={{ width: '100%', height: 30, bgcolor: '#e0e0e0', borderRadius: 1, mt: 2 }} />
+            {/* skeleton loaders... */}
           </Box>
         ) : (
           <Box>
@@ -108,15 +161,10 @@ const StatCard: React.FC<StatCardProps> = ({
               <Box
                 component="span"
                 sx={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  bgcolor: `${chartColor}20`,
-                  color: chartColor,
-                  px: 1,
-                  py: 0.5,
-                  borderRadius: 1,
-                  fontSize: '0.75rem',
-                  fontWeight: 600,
+                  display: 'inline-flex', alignItems: 'center',
+                  bgcolor: `${chartColor}20`, color: chartColor,
+                  px: 1, py: 0.5, borderRadius: 1,
+                  fontSize: '0.75rem', fontWeight: 600,
                 }}
               >
                 {trendIcon} {trendLabel}
@@ -126,39 +174,48 @@ const StatCard: React.FC<StatCardProps> = ({
               {interval}
             </Typography>
 
-            {/* Statistik */}
+            {/* Statistik Deskriptif */}
             <Box sx={{ mb: 2 }}>
               <Typography variant="caption" color="text.secondary" display="block" mb={1}>
                 Statistik Deskriptif
               </Typography>
               <Stack spacing={0.5}>
-                {statLine('Rata-rata', details.mean)}
-                {statLine('Median', details.median)}
-                {statLine('Maksimum', details.max)}
-                {statLine('Minimum', details.min)}
-                {statLine('Range', details.range)}
-                {statLine('Std Deviasi', details.std_dev)}
-                {statLine('Variansi', details.variance)}
-                {statLine('Jumlah NA', details.na_count, 0)}
+                {statLine('Rata-rata', details.mean ?? details.mean_value)}
+                {statLine('Median', details.median ?? details.median_value)}
+                {statLine('Maksimum', details.max ?? details.max_value)}
+                {statLine('Minimum', details.min ?? details.min_value)}
+                {statLine('Range', details.range ?? (details.max - details.min))}
+                {statLine('Std Deviasi', details.std_dev
+                  ?? details.standard_deviation
+                  ?? details.std_deviation)}
+                {statLine('Variansi', details.variance ?? details.var_value)}
+                {statLine('Jumlah NA', details.na_count
+                  ?? details.na_value
+                  ?? details.missing_count
+                  ?? 0, 0)}
               </Stack>
             </Box>
 
             {/* Grafik */}
-            <Box sx={{ width: '100%', height: 50, mt: 1 }}>
+            <Box sx={{ width: '100%', height: 50, mt: 1, mx: 0 }}>
               <SparkLineChart
                 color={chartColor}
-                data={data}
+                data={chartData}
                 area
                 showHighlight
                 showTooltip
                 height={50}
+                xAxis={{
+                  scaleType: 'band',
+                  data: years,
+                }}
                 sx={{
                   [`& .${areaElementClasses.root}`]: {
-                    fill: `${chartColor}40`,
+                    fill: `url(#area-gradient-${value})`,
                   },
                 }}
               >
-                <AreaGradient color={chartColor} id={`area-gradient-${title}`} />
+                <AreaGradient color={chartColor} id={`area-gradient-${value}`} />
               </SparkLineChart>
             </Box>
           </Box>
