@@ -15,7 +15,6 @@ export function useCountries() {
     fetch('http://127.0.0.1:8000/countries')
       .then(res => res.json())
       .then(data => {
-        console.log('Fetched countries:', data.countries);
         if (data && Array.isArray(data.countries)) {
           // World at very top, then continents, then the rest
           const worldCodes = ['WLD'];

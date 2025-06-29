@@ -1,0 +1,35 @@
+/* Hapus margin/padding default dan paksa full-bleed untuk root dan body */
+html, body, #root {
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100vw;
+  min-height: 100vh;
+  overflow-x: hidden;
+  background-color: black;
+}
+
+/* Hilangkan margin-top pada Box dengan class css-vk6yw6 */
+.MuiBox-root.css-vk6yw6 {
+  margin-top: 0 !important;
+  padding: 0 0 !important;
+  width: 100%;
+  height: 100%;
+}
+.MuiBox-root.css-hx5qdz{
+    margin: 0 0 !important;
+    padding: 0 0 !important;
+    width: 100%;
+    height: 100%;
+}
+.MuiBox-root.css-vk6yw6{
+    margin: 0 0 !important;
+    padding: 0 0 !important;
+    width: 100%;
+    height: 100%;
+}
+.MuiStack-root.css-sei7bw-MuiStack-root{
+    margin: 0 0 !important;
+    padding: 0 0 !important;
+    width: 100%;
+    height: 100%;
+}

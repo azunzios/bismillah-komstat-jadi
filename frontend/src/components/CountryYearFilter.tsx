@@ -10,19 +10,32 @@ import {
 import { useCountries } from './useCountries';
 
 const minYear = 1970;
-const maxYear = 2023;
+const maxYear = 2025;
 
 interface CountryYearFilterProps {
   onCountryChange?: (value: string | null) => void;
   onYearChange?: (range: number[]) => void;
+  yearRange?: number[]; // Tambahkan prop yearRange
 }
 
 export default function CountryYearFilter({
   onCountryChange = () => {},
-  onYearChange = () => {}
+  onYearChange = () => {},
+  yearRange: yearRangeProp // Ambil prop yearRange dari parent
 }: CountryYearFilterProps) {
   const [country, setCountry] = React.useState<string | null>('');
-  const [yearRange, setYearRange] = React.useState<number[]>([2013, 2023]);
+  // Gunakan yearRange dari prop jika ada, jika tidak pakai default
+  const [yearRange, setYearRange] = React.useState<number[]>(yearRangeProp || [2013, 2023]);
+  // Sinkronkan state dengan prop jika berubah dari parent
+  React.useEffect(() => {
+    if (
+      yearRangeProp &&
+      (yearRangeProp[0] !== yearRange[0] || yearRangeProp[1] !== yearRange[1])
+    ) {
+      setYearRange(yearRangeProp);
+    }
+    // eslint-disable-next-line
+  }, [yearRangeProp]);
   const [focused, setFocused] = React.useState(false);
   const { countries, loading, error } = useCountries();
 
@@ -60,7 +73,7 @@ export default function CountryYearFilter({
                   '& .MuiInputAdornment-root .MuiSvgIcon-root': {
                     fontSize: 16,
                     minWidth: 24,
-                    p: 0
+                    p: 0,
                   },
                   fontSize: 14
                 }
@@ -71,7 +84,7 @@ export default function CountryYearFilter({
           size="small"
           sx={{
             minWidth: 120,
-            maxWidth: 220,
+            maxWidth: '100%',
             '& .MuiInputBase-root': {
               minHeight: 32,
               fontSize: 14

@@ -18,7 +18,7 @@ import {
   treeViewCustomizations,
 } from './theme/customizations';
 
-const xThemeComponents = {
+const xThemeComponents = {  
   ...chartsCustomizations,
   ...dataGridCustomizations,
   ...datePickersCustomizations,
@@ -37,6 +37,38 @@ const xThemeComponents = {
  * @returns {JSX.Element} The rendered JSX element.
  */
 export default function Dashboard(props: { disableCustomTheme?: boolean }) {
+  const [showAppBar, setShowAppBar] = React.useState(true);
+  const [appBarStyle, setAppBarStyle] = React.useState({
+    transform: 'translateY(0)',
+    opacity: 1,
+    pointerEvents: 'auto',
+  });
+  const lastScroll = React.useRef(0);
+
+  React.useEffect(() => {
+    const handleScroll = () => {
+      const currentScroll = window.scrollY;
+      if (currentScroll > 200 && currentScroll > lastScroll.current) {
+        // Scroll down, hide AppBar
+        setAppBarStyle({
+          transform: 'translateY(-110%)',
+          opacity: 0,
+          pointerEvents: 'none',
+        });
+      } else {
+        // Scroll up or near top, show AppBar
+        setAppBarStyle({
+          transform: 'translateY(0)',
+          opacity: 1,
+          pointerEvents: 'auto',
+        });
+      }
+      lastScroll.current = currentScroll;
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   return (
     <AppTheme {...props} themeComponents={xThemeComponents}>
       <CssBaseline enableColorScheme />
@@ -55,9 +87,12 @@ export default function Dashboard(props: { disableCustomTheme?: boolean }) {
           top: 0,
           left: 0,
           right: 0,
-          zIndex: 1000
+          zIndex: 1000,
+          transition: 'transform 0.35s cubic-bezier(.4,0,.2,1), opacity 0.35s cubic-bezier(.4,0,.2,1)',
+          willChange: 'transform, opacity',
+          ...appBarStyle,
         }}>
-        <AppAppBar />
+          <AppAppBar />
         </Box>
         {/* Main Content Area */}
         <Box

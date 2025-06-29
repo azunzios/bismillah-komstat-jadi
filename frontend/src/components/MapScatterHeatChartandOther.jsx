@@ -101,7 +101,7 @@ const MapChart = () => {
 
   return (  
     <Grid container spacing={2} columns={5} rows={3} direction="row">
-      <Grid item size={1}>
+      <Grid item size={{xs:5, md:1}}>
         <Typography gutterBottom>Gas Type</Typography>
         <Select
           value={selectedGas}
@@ -113,9 +113,9 @@ const MapChart = () => {
           ))}
         </Select>
       </Grid>
-      <Grid item size={3}>
+      <Grid item size={{xs:5, md:3}}>
       </Grid>
-      <Grid item size={1}>
+      <Grid item size={{xs:5, md:1}}>
         <Typography gutterBottom>Year</Typography>
         <Slider
           value={selectedYear}
@@ -147,7 +147,7 @@ const MapChart = () => {
                   Emission Levels
                 </Typography>
                 {legendRanges.map((range, index) => (
-                  <Box key={index} sx={{ display: 'flex', alignItems: 'center', mb: 0.5, width: '100%' }}>
+                  <Box key={index} sx={{ display: 'flex', alignItems: 'center', mb: {sx: 1, md:0.5}, width: '100%' }}>
                     <Box
                       sx={{
                         width: 20,

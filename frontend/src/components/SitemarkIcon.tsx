@@ -5,7 +5,7 @@ import Typography from '@mui/material/Typography';
 export default function SitemarkIcon() {
   return (
     <div>
-      <Typography variant="h6" component="div" sx={{ ml: 2, mr: 2, color: 'text.primary' }}>
+      <Typography variant="h5" component="div" sx={{mr: 2, color: '#fff' }}>
       Dashboard GHGE
     </Typography>
     </div>

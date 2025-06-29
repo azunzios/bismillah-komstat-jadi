@@ -163,7 +163,7 @@ export default function YoYGrowthTrend() {
   return (
 
     <Grid container spacing={2} columns={2}>
-      <Grid item xs={12} md={6} size={1}>
+      <Grid item size={2}>
         <Card variant="outlined" sx={{overflow: 'visible'}}>
           <CardContent sx={{overflow: 'visible'}}>
             <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' , justifyContent: 'space-between', gap: '10px'}}>
@@ -276,11 +276,12 @@ export default function YoYGrowthTrend() {
           </CardContent>
         </Card>
       </Grid>
-      <Grid item xs={12} md={6} size={1} overflow="hidden">
+      <Grid item size={2} overflow="hidden">
         <Card sx={{ p: 2 }}>
-          <Grid container rowSpacing={2} justifyContent="space-between" marginX={2} overflow="hidden" wrap="nowrap">
+          <Grid container rowSpacing={2} columns={12}>
             {gasOptions.map((g) => (
-              <Grid key={g.value} item xs={6} sx={{ p: 1 }} display="flex" justifyContent="center" alignItems="center" flexWrap="wrap" flexDirection="column">
+              <Grid item size="12">
+              <Grid key={g.value} item sx={{ p: 1 }} size={{xs:12}} display="flex" justifyContent="center" alignItems="center" flexWrap="wrap" flexDirection="column">
                 <Typography variant="body2" gutterBottom align="center" sx={{ maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'wrap' }}>
                   {`Kontribusi ${countries.find(c => c.code === countryCode)?.name || ''} 
                   terhadap emisi gas ${g.label} dunia (%)`}
@@ -301,6 +302,7 @@ export default function YoYGrowthTrend() {
                     },
                   })}
                 />
+              </Grid>
               </Grid>
             ))}
           </Grid>
